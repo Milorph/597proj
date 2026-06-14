@@ -87,6 +87,11 @@ ISO_FOREST_ESTIMATORS = 200
 # reconstruction-error / anomaly-score cut-off.
 TARGET_FPR = 0.05
 
+# Phase-3 cascade: fraction of true attacks the confirmation stage must keep.
+# The cascade rejects an alert only when the flow model is confident it is benign,
+# so detection (recall) is preserved while false positives are removed.
+TARGET_CASCADE_RECALL = 0.95
+
 # --------------------------------------------------------------------------- #
 # Misc
 # --------------------------------------------------------------------------- #

@@ -70,8 +70,8 @@
         "detection_rate": 0.9230769230769231
       }
     },
-    "fit_seconds": 10.605924377000065,
-    "predict_seconds": 0.6102858829999604,
+    "fit_seconds": 15.975629483999995,
+    "predict_seconds": 0.6503805839999757,
     "fpr_targeted_threshold": {
       "threshold": 1.1140205546100217,
       "target_fpr": 0.05,
@@ -179,8 +179,8 @@
           "detection_rate": 1.0
         }
       },
-      "fit_seconds": 1.366748838000035,
-      "predict_seconds": 0.0263728390000324
+      "fit_seconds": 74.93310542899997,
+      "predict_seconds": 0.0502457710000499
     },
     "task3_3_supervised_with_flow_anomaly": {
       "backend": "xgboost",
@@ -225,8 +225,8 @@
           "detection_rate": 1.0
         }
       },
-      "fit_seconds": 1.5601648580000074,
-      "predict_seconds": 0.025977732000001197
+      "fit_seconds": 17.139212944000008,
+      "predict_seconds": 0.06069456200003742
     },
     "cascade_model": "with_flow_anomaly",
     "top_flow_features": {
@@ -242,7 +242,9 @@
       "header_len_total": 0.0082550048828125,
       "protocol": 0.00781780295073986,
       "rst_count": 0.006491425912827253
-    }
+    },
+    "cascade_confirm_threshold": 0.1,
+    "cascade_target_recall": 0.95
   },
   "cascade": {
     "phase2_only": {
@@ -322,10 +324,10 @@
       "discordant_b_only": 10898
     },
     "timing": {
-      "phase2_fit_s": 10.605924377000065,
-      "phase2_predict_s": 0.6102858829999604,
-      "phase3_fit_s": 1.366748838000035,
-      "phase3_predict_s": 0.0263728390000324,
+      "phase2_fit_s": 15.975629483999995,
+      "phase2_predict_s": 0.6503805839999757,
+      "phase3_fit_s": 74.93310542899997,
+      "phase3_predict_s": 0.0502457710000499,
       "n_packets_scored_phase2": 61727,
       "n_packets_flagged_for_phase3": 12437,
       "phase3_workload_fraction": 0.20148395353734994

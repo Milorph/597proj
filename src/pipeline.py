@@ -266,16 +266,34 @@ def run(scale: str = "demo", seed: int = config.DEFAULT_SEED,
     Xcasc = fprep.transform(mapped.ffill().bfill())
     if do_flow_unsup and report["phase3"]["cascade_model"] == "with_flow_anomaly":
         casc_anom = fdet.anomaly_score(Xcasc).reshape(-1, 1)
-        flow_proba = clf_for_cascade.predict_proba(np.hstack([Xcasc, casc_anom]))
+        Xcasc_full = np.hstack([Xcasc, casc_anom])
+        Xval_casc = np.hstack([Xf_val, flow_anom_val])
     else:
-        flow_proba = clf_for_cascade.predict_proba(Xcasc)
-    phase3_confirm = (flow_proba >= thr_main).astype(int)
+        Xcasc_full = Xcasc
+        Xval_casc = Xf_val
+    flow_proba = clf_for_cascade.predict_proba(Xcasc_full)
+
+    # Recall-preserving confirmation threshold. Phase 3's job in the cascade is to
+    # drop Phase-2 *false positives* WITHOUT discarding real attacks, so we pick
+    # the lowest probability cut-off that still confirms >= TARGET_CASCADE_RECALL
+    # of the validation attacks (i.e. only reject an alert when the flow model is
+    # confident the flow is benign). Never stricter than the F1-optimal threshold.
+    atk_val = clf_for_cascade.predict_proba(Xval_casc)[yf_val == 1]
+    thr_cascade = (float(np.quantile(atk_val, 1 - config.TARGET_CASCADE_RECALL))
+                   if len(atk_val) else thr_main)
+    thr_cascade = min(thr_cascade, thr_main)
+    report["phase3"]["cascade_confirm_threshold"] = thr_cascade
+    report["phase3"]["cascade_target_recall"] = config.TARGET_CASCADE_RECALL
+
+    phase3_confirm = (flow_proba >= thr_cascade).astype(int)
     phase3_confirm[~have_flow] = phase2_pred[~have_flow]    # no flow -> trust Phase 2
 
     combined_pred = (phase2_pred & phase3_confirm).astype(int)
 
-    # Single-stage baselines for comparison.
-    supervised_only = phase3_confirm.copy()                 # flow model on all packets
+    # Single-stage baseline: the flow model alone, at its own F1-optimal threshold
+    # (packets with no matching flow can't be classified -> treated benign).
+    supervised_only = (flow_proba >= thr_main).astype(int)
+    supervised_only[~have_flow] = 0
 
     m_combined = evaluate.binary_metrics(y_te_bin, combined_pred, scores_te)
     m_suponly = evaluate.binary_metrics(y_te_bin, supervised_only, flow_proba)
