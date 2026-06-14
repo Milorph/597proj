@@ -1,0 +1,90 @@
+"""
+Central configuration for the two-stage IoT IDS project.
+
+All tunable constants, file paths, and the canonical list of attack types live
+here so that every module shares one source of truth.
+
+NOTE ON DATA SOURCE
+-------------------
+The real CIC IoT-DIAD 2024 dataset must be downloaded from
+    http://cicresearch.ca/IOTDataset/CIC%20IoT-IDAD%20Dataset%202024/
+and the packet-level / flow-level CSVs placed under ``DATA_DIR`` (see README).
+If those files are not present, the pipeline falls back to a schema-faithful
+synthetic generator (``src/data_synth.py``) so the full system remains runnable
+and reproducible without the gated download. The downstream code path is
+identical for real and synthetic data.
+"""
+from __future__ import annotations
+
+import os
+
+# --------------------------------------------------------------------------- #
+# Paths
+# --------------------------------------------------------------------------- #
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.environ.get("IDS_DATA_DIR", os.path.join(ROOT_DIR, "data"))
+RESULTS_DIR = os.path.join(ROOT_DIR, "results")
+FIG_DIR = os.path.join(RESULTS_DIR, "figures")
+METRICS_DIR = os.path.join(RESULTS_DIR, "metrics")
+
+# Real-dataset file names expected under DATA_DIR (override via env if needed).
+PACKET_CSV = os.environ.get("IDS_PACKET_CSV", os.path.join(DATA_DIR, "packet_level.csv"))
+FLOW_CSV = os.environ.get("IDS_FLOW_CSV", os.path.join(DATA_DIR, "flow_level.csv"))
+
+# --------------------------------------------------------------------------- #
+# Attack taxonomy (per project spec, Section 3)
+# --------------------------------------------------------------------------- #
+BENIGN_LABEL = "Benign"
+ATTACK_TYPES = [
+    "DDoS-HTTP_Flood",
+    "DoS-HTTP_Flood",
+    "DNS_Spoofing",
+    "XSS",
+    "Brute_Force",
+]
+ALL_CLASSES = [BENIGN_LABEL] + ATTACK_TYPES
+
+# --------------------------------------------------------------------------- #
+# Sampling specification (Task 1.1)
+# --------------------------------------------------------------------------- #
+N_BENIGN = 200_000          # benign rows per sampled dataset (~97-98%)
+ATTACK_MIN = 4_000          # lower bound on total attack rows (~2-3%)
+ATTACK_MAX = 6_200          # upper bound on total attack rows
+
+# --------------------------------------------------------------------------- #
+# Reproducibility
+# --------------------------------------------------------------------------- #
+DEFAULT_SEED = 42
+
+# --------------------------------------------------------------------------- #
+# Synthetic-data scale (only used when real CSVs are absent)
+# --------------------------------------------------------------------------- #
+# Size of the synthetic *population* the sampler draws from. Kept well above the
+# sample size so random sampling is meaningful, but small enough to run on a
+# laptop in a few minutes.
+SYNTH_BENIGN_POP = 320_000
+SYNTH_ATTACK_POP_PER_TYPE = 9_000
+
+# --------------------------------------------------------------------------- #
+# Phase 2 (unsupervised) defaults
+# --------------------------------------------------------------------------- #
+AE_HIDDEN = (32, 12, 32)    # MLP autoencoder bottleneck architecture
+AE_MAX_ITER = 60
+KMEANS_K = 8                # over-clustering, clusters mapped to benign/anomaly
+ISO_FOREST_ESTIMATORS = 200
+
+# Threshold selection: target benign false-positive rate when picking the
+# reconstruction-error / anomaly-score cut-off.
+TARGET_FPR = 0.05
+
+# --------------------------------------------------------------------------- #
+# Misc
+# --------------------------------------------------------------------------- #
+TEST_SIZE = 0.30
+VAL_SIZE = 0.20             # fraction of the train split held out for validation
+
+
+def ensure_dirs() -> None:
+    """Create the output directory tree if it does not yet exist."""
+    for d in (DATA_DIR, RESULTS_DIR, FIG_DIR, METRICS_DIR):
+        os.makedirs(d, exist_ok=True)

@@ -1,0 +1,16 @@
+# Data: the real CIC IoT-DIAD 2024 CSVs are large and must be downloaded
+# separately (see README). The synthetic fallback is generated on the fly.
+data/
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Allow committed result artifacts (figures + metrics) so the repo is
+# self-documenting, but ignore scratch.
+/tmp/
+*.log
