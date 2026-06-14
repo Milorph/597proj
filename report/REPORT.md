@@ -77,16 +77,17 @@ TCP-Flood flow data is absent from this release.
 
 **Task 1.1 — Random sampler (`src/sampling.py`).** `sample_dataset` draws
 200,000 benign rows and a random `4,000–6,200` total attack rows (≈ 2–3 %).
-The attack budget is split across the five types with **Dirichlet-random
-weights** (mild concentration, every type guaranteed ≥ 1 row), so each run
-produces a *different attack composition* while preserving the imbalance ratio.
+The attack budget is spread **roughly uniformly across the five types**
+(each centred on `total/5` with a ±15 % random jitter, every type guaranteed
+≥ 1 row), so each run produces a *different attack composition* while keeping
+an even split and preserving the imbalance ratio.
 The function performs integrity checks (required columns, sufficient pool sizes,
 exact benign count, attack ceiling) and is reused unchanged for both the
 packet-level and flow-level samples. A representative draw:
 
 ```
 total=205,754  benign=200,000  attack=5,754 (2.80%)
-per-attack: DDoS=524  DoS=1219  DNS=2192  XSS=935  BruteForce=884
+per-attack: DDoS=1128  DoS=1065  DNS=1289  XSS=1232  BruteForce=1040
 ```
 
 **Task 1.2 — Preprocessing (`src/preprocessing.py`).** A fit-once / apply-many
@@ -165,17 +166,17 @@ All figures are in `results/figures/`; all numbers in
 
 | Metric | Value |
 |---|---|
-| Precision | 0.116 |
-| Recall | **0.824** |
-| F1 | 0.203 |
-| AUC-ROC | **0.891** |
-| FPR | 0.181 |
-| FNR | 0.176 |
-| Accuracy | 0.819 |
-| Confusion (TP/FP/TN/FN) | 1422 / 10846 / 49155 / 304 |
+| Precision | 0.123 |
+| Recall | **0.886** |
+| F1 | 0.216 |
+| AUC-ROC | **0.917** |
+| FPR | 0.182 |
+| FNR | 0.114 |
+| Accuracy | 0.820 |
+| Confusion (TP/FP/TN/FN) | 1529 / 10908 / 49093 / 197 |
 
 The low precision is **by design**: at a 20 % alert budget the detector raises
-10,846 false positives to achieve 82 % recall and AUC 0.891. This is the wide
+10,908 false positives to achieve 89 % recall and AUC 0.917. This is the wide
 net the second stage will clean up. (Figures: `cm_phase2.svg`,
 `phase2_score_dist.svg`.)
 
@@ -183,13 +184,13 @@ net the second stage will clean up. (Figures: `cm_phase2.svg`,
 
 | Attack | Detection rate |
 |---|---|
-| DDoS-HTTP Flood | 0.955 |
-| DoS-HTTP Flood | 0.959 |
-| DNS Spoofing | 0.795 |
-| Brute Force | 0.917 |
-| XSS | **0.554** |
+| DoS-HTTP Flood | 0.997 |
+| DDoS-HTTP Flood | 0.988 |
+| DNS Spoofing | 0.969 |
+| Brute Force | 0.923 |
+| XSS | **0.578** |
 
-Volumetric and protocol-anomalous attacks (floods, brute force, DNS spoofing)
+Volumetric and protocol-anomalous attacks (floods, DNS spoofing, brute force)
 are highly detectable from individual packets; **XSS is the hardest** at the
 packet level because its malicious character lives in the *session/payload*
 pattern, not in any single packet (revisited in Section 4.3).
@@ -198,42 +199,42 @@ pattern, not in any single packet (revisited in Section 4.3).
 
 | Model | F1 | AUC | FPR |
 |---|---|---|---|
-| Flow supervised (base) | **0.9986** | 1.000 | 0.000 |
-| Flow supervised (+ flow-anomaly feature) | 0.9979 | 1.000 | 0.000 |
+| Flow supervised (base) | **0.9944** | 1.000 | 0.000 |
+| Flow supervised (+ flow-anomaly feature) | 0.9945 | 1.000 | 0.000 |
 
 The flow classifier is near-perfect on these features. The most important flow
-features (XGBoost gain) are interpretable: `pkt_len_max` (0.68), `pkt_len_std`
-(0.17), `psh_count`, `iat_std`, `total_packets`.
+features (XGBoost gain) are interpretable: `pkt_len_max` (0.60), `pkt_len_std`
+(0.22), `psh_count`, `iat_std`, `total_packets`.
 
 ### 3.3 Two-stage system vs single-stage baselines
 
 | System | Precision | Recall | False Positives | Accuracy |
 |---|---|---|---|---|
-| Stage 1 only (packet, unsupervised) | 0.116 | 0.824 | **10,846** | 0.819 |
-| Single-stage supervised (flow, all packets) | 0.989 | **0.998** | 19 | 0.999 |
-| **Two-stage (Stage 1 ∧ Stage 2)** | **0.995** | 0.823 | **7** | 0.995 |
+| Stage 1 only (packet, unsupervised) | 0.123 | 0.886 | **10,908** | 0.820 |
+| Single-stage supervised (flow, all packets) | 0.976 | **0.999** | 42 | 0.999 |
+| **Two-stage (Stage 1 ∧ Stage 2)** | **0.993** | 0.885 | **10** | 0.997 |
 
-**False-positive reduction: 10,846 → 7 = 99.94 %**, with recall preserved
-(0.824 → 0.823 — only true positives Stage 1 happened to miss are lost, none are
+**False-positive reduction: 10,908 → 10 = 99.91 %**, with recall preserved
+(0.886 → 0.885 — only true positives Stage 1 happened to miss are lost, none are
 introduced). Figures: `cm_combined.svg`, `roc_compare.svg`, `pr_compare.svg`,
 `per_attack_compare.svg`.
 
 ### 3.4 Statistical significance
 
 **McNemar's test**, two-stage vs Stage-1-only on the 61,727-packet test set:
-χ² = 10,831, **p ≈ 0**. The discordances are entirely one-directional: the
-two-stage system **corrects 10,839 of Stage 1's errors and introduces none**.
-The improvement is overwhelmingly significant, not noise.
+χ² = 10,893, **p ≈ 0**. The discordances are almost entirely one-directional:
+the two-stage system **corrects 10,898 of Stage 1's errors while introducing
+only 1**. The improvement is overwhelmingly significant, not noise.
 
 ### 3.5 Computational overhead and time complexity
 
 | Stage | Fit time | Predict time | Notes |
 |---|---|---|---|
-| Phase 2 (unsupervised) | 11.07 s | 0.60 s | AE training dominates |
-| Phase 3 (supervised) | 1.45 s | 0.03 s | trees train fast |
+| Phase 2 (unsupervised) | 10.51 s | 0.62 s | AE training dominates |
+| Phase 3 (supervised) | 1.39 s | 0.03 s | trees train fast |
 
-**Workload of the cascade:** Phase 3 only scores the **19.9 %** of packets that
-Phase 2 flagged (12,268 of 61,727), so the expensive supervised stage runs on a
+**Workload of the cascade:** Phase 3 only scores the **20.1 %** of packets that
+Phase 2 flagged (12,437 of 61,727), so the expensive supervised stage runs on a
 fifth of the traffic. Asymptotically, Phase-2 inference is `O(N·(d + T))` (AE
 forward pass + `T` isolation trees) and Phase-3 inference is `O(α·N·T)` with
 α ≈ 0.2 the alert fraction — i.e. the second stage adds only a sublinear
@@ -247,12 +248,12 @@ constant-factor overhead on top of the first.
 
 Stage 1 inspects a **single packet** at a time, so any momentarily unusual
 benign packet (a large transfer, an odd inter-arrival gap) can trip it — hence
-10,846 false alarms. Stage 2 looks at the **whole flow** the packet belongs to:
+10,908 false alarms. Stage 2 looks at the **whole flow** the packet belongs to:
 aggregated over a flow, benign behaviour is unmistakably benign (steady packet
-sizes, normal totals, ordinary flag mix), so the supervised classifier confiding
+sizes, normal totals, ordinary flag mix), so the supervised classifier confidently
 rejects those alerts. The cascade's AND-logic means an alert survives only if it
 is anomalous *both* in isolation *and* in aggregate — which is exactly the
-profile of a real attack. This is why precision jumps from 0.12 to 0.995 while
+profile of a real attack. This is why precision jumps from 0.12 to 0.993 while
 recall is untouched.
 
 ### 4.2 Flow-based advantages (hypothesis test)
@@ -261,10 +262,10 @@ Running the **same** unsupervised ensemble on flow features vs packet features:
 
 | | Packet-level | Flow-level |
 |---|---|---|
-| Unsupervised AUC-ROC | 0.891 | **0.978** |
+| Unsupervised AUC-ROC | 0.917 | **0.982** |
 
 The hypothesis that **flow features are more separable in the unsupervised
-setting holds** (AUC 0.978 > 0.891). Aggregation denoises: a per-packet length
+setting holds** (AUC 0.982 > 0.917). Aggregation denoises: a per-packet length
 is noisy, but a flow's mean/peak/spread of lengths is a stable signature. This
 is also why the supervised stage — which is *built* on flow features — reaches
 near-perfect F1.
@@ -274,30 +275,33 @@ near-perfect F1.
 Comparing per-attack detection at the packet level (Stage 1) vs the flow-level
 *unsupervised* detector reveals a clean division of labour:
 
-| Attack | Packet unsup. | Flow unsup. | Interpretation |
+| Attack | Packet unsup. | Flow unsup. | Who wins |
 |---|---|---|---|
-| DDoS-HTTP Flood | 0.955 | 0.509 | volumetric — *every packet* is anomalous, so packets win |
-| DoS-HTTP Flood | 0.959 | 0.463 | same |
-| DNS Spoofing | 0.795 | 0.356 | protocol/port anomaly visible per packet |
-| Brute Force | 0.917 | 0.850 | repeated handshakes visible both ways |
-| **XSS** | **0.554** | **0.780** | **stealthy — signal only emerges when the session is aggregated** |
+| DoS-HTTP Flood | 0.997 | 0.694 | **packets** — *every packet* is anomalous (tiny, high-rate) |
+| DDoS-HTTP Flood | 0.988 | 0.753 | **packets** — same volumetric signature |
+| DNS Spoofing | 0.969 | 0.120 | **packets** — protocol/port anomaly is obvious per packet; the short flows are easy to miss in aggregate |
+| Brute Force | 0.923 | **0.994** | **flow** — the repeated-handshake pattern is a flow-level property |
+| **XSS** | **0.578** | **0.664** | **flow** — stealthy; the signal only emerges once the session is aggregated |
 
-**XSS benefits most from the flow/two-stage view.** Volumetric floods are
-trivially caught packet-by-packet (each flood packet is individually weird), so
-aggregating them actually *dilutes* the signal at a strict threshold. The
-stealthy application-layer attack (XSS) is the opposite: no single packet looks
-malicious, but the flow does. A hybrid that uses *both* views is therefore
+**The two views are complementary, and that is the whole point.** Volumetric
+floods and DNS spoofing are trivially caught packet-by-packet (each malicious
+packet is individually weird), so aggregating them actually *dilutes* the signal
+at a strict threshold. The stealthier attacks (XSS, brute force) are the
+opposite: no single packet looks malicious, but the flow does. **XSS and brute
+force benefit most from the flow/two-stage view**, while floods and DNS are
+already solved at the packet level. A hybrid that uses *both* views is therefore
 strictly better than either alone — the core argument for the two-stage design.
 
 ### 4.4 Did the engineered flow-anomaly feature help?
 
 We trained the supervised model **with and without** the Phase-3.1 flow-anomaly
-score as an extra feature. It did **not** improve results (F1 0.9979 vs 0.9986),
-so the cascade uses the base model. The honest reason: the base flow features
-are already so separable that an extra unsupervised score is redundant. We
-report this negative result rather than hide it — on noisier real data, where
-the supervised model is not near-perfect, such a feature is more likely to earn
-its place.
+score as an extra feature. The difference was **negligible** (F1 0.9945 vs
+0.9944 — a one-row tie-break on the validation set, after which the pipeline
+kept the marginally-better augmented model). The honest reason it cannot help
+much here: the base flow features are already so separable that an extra
+unsupervised score is largely redundant. We report this near-null result rather
+than hide it — on noisier real data, where the supervised model is *not*
+near-perfect, such a feature is far more likely to earn its place.
 
 ### 4.5 Flow-length analysis
 
@@ -305,18 +309,19 @@ Does a longer flow (more packets / longer duration) make an attack easier to
 detect? Measured on the flow-level unsupervised detector at a *selective*
 operating point (`results/metrics/flow_length_analysis_demo.json`):
 
-* **Duration vs detection:** Pearson r = **0.27, p < 1e-6** — longer flows are
+* **Duration vs detection:** Pearson r = **0.29, p ≈ 3e-8** — longer flows are
   significantly more detectable.
-* **Packet count vs detection (raw):** r = −0.14 — *confounded* by attack type
-  (floods have many packets but are detected differently than long stealthy
-  sessions).
+* **Packet count vs detection (overall):** r = 0.18, p ≈ 1e-3 — positive but
+  weaker, because it is *confounded* by attack type (floods carry many packets
+  yet are detected differently than long stealthy sessions).
 * **Within-attack-type** (removes the confound): the effect is concentrated in
-  **XSS — r = 0.56, p ≈ 5e-7**. For volumetric floods packet count is
-  essentially irrelevant (r ≈ 0.08) because they are already obvious.
+  the **non-volumetric** attacks — **XSS r = 0.69 (p ≈ 2e-9)** and
+  **DNS Spoofing r = 0.72** — whereas for the floods packet count is essentially
+  irrelevant (DDoS r ≈ 0.14, DoS r ≈ 0.01) because they are already obvious.
 
-**Conclusion:** flow length helps *most where it matters* — the stealthy attack
-whose evidence accumulates over the session. For volumetric attacks the first
-packet already gives the game away. (Figure: `flow_length_analysis.svg`.)
+**Conclusion:** flow length helps *most where it matters* — the stealthier
+attacks whose evidence accumulates over the session. For volumetric attacks the
+first packet already gives the game away. (Figure: `flow_length_analysis.svg`.)
 
 ### 4.6 Cluster structure (DoS/DDoS view)
 
@@ -336,17 +341,19 @@ which is all Stage 1 needs.
 ### 5.1 Key findings
 
 * A two-stage **unsupervised → supervised** cascade cut packet-level false
-  positives by **99.9 % (10,846 → 7)** while **preserving recall**, lifting
-  precision from 0.12 to 0.995 and overall accuracy to 0.995. The gain is
-  statistically overwhelming (McNemar p ≈ 0, zero regressions).
+  positives by **99.9 % (10,908 → 10)** while **preserving recall**, lifting
+  precision from 0.12 to 0.993 and overall accuracy to 0.997. The gain is
+  statistically overwhelming (McNemar p ≈ 0; it corrects 10,898 errors and
+  introduces 1).
 * The second stage runs on only **~20 %** of traffic (the flagged subset), so
   the accuracy gain comes with low marginal cost.
 * **Flow features are more separable than packet features** in the unsupervised
-  setting (AUC 0.978 vs 0.891), confirming the brief's hypothesis.
+  setting (AUC 0.982 vs 0.917), confirming the brief's hypothesis.
 * Packet- and flow-level views are **complementary**: packets dominate on
-  volumetric floods, flows dominate on stealthy XSS — justifying a hybrid.
-* Flow length correlates with detectability **specifically for stealthy
-  attacks** (XSS within-type r = 0.56).
+  volumetric floods and DNS spoofing, flows dominate on stealthy XSS and brute
+  force — justifying a hybrid.
+* Flow length correlates with detectability **specifically for the
+  non-volumetric attacks** (within-type r ≈ 0.69 for XSS, 0.72 for DNS spoofing).
 
 ### 5.2 Limitations
 

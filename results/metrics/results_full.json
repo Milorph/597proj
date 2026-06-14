@@ -29,64 +29,64 @@
   "phase2": {
     "contamination": 0.02796697841376964,
     "alert_budget": 0.2,
-    "threshold": 0.500025549488598,
+    "threshold": 0.48758382530629396,
     "metrics": {
-      "precision": 0.11591131398761004,
-      "recall": 0.8238702201622248,
-      "f1": 0.20322995569529798,
-      "accuracy": 0.8193659176697393,
-      "fpr": 0.18076365393910102,
-      "fnr": 0.1761297798377752,
-      "tp": 1422,
-      "fp": 10846,
-      "tn": 49155,
-      "fn": 304,
-      "auc_roc": 0.8914078160497249
+      "precision": 0.12293961566294122,
+      "recall": 0.8858632676709154,
+      "f1": 0.2159147073360164,
+      "accuracy": 0.8200949341455117,
+      "fpr": 0.18179697005049916,
+      "fnr": 0.11413673232908458,
+      "tp": 1529,
+      "fp": 10908,
+      "tn": 49093,
+      "fn": 197,
+      "auc_roc": 0.9171700556632283
     },
     "per_attack_detection": {
       "DDoS-HTTP_Flood": {
-        "detected": 150,
-        "total": 157,
-        "detection_rate": 0.9554140127388535
+        "detected": 334,
+        "total": 338,
+        "detection_rate": 0.9881656804733728
       },
       "DoS-HTTP_Flood": {
-        "detected": 351,
-        "total": 366,
-        "detection_rate": 0.9590163934426229
+        "detected": 318,
+        "total": 319,
+        "detection_rate": 0.9968652037617555
       },
       "DNS_Spoofing": {
-        "detected": 523,
-        "total": 658,
-        "detection_rate": 0.7948328267477204
+        "detected": 375,
+        "total": 387,
+        "detection_rate": 0.9689922480620154
       },
       "XSS": {
-        "detected": 155,
-        "total": 280,
-        "detection_rate": 0.5535714285714286
+        "detected": 214,
+        "total": 370,
+        "detection_rate": 0.5783783783783784
       },
       "Brute_Force": {
-        "detected": 243,
-        "total": 265,
-        "detection_rate": 0.9169811320754717
+        "detected": 288,
+        "total": 312,
+        "detection_rate": 0.9230769230769231
       }
     },
-    "fit_seconds": 11.905821758999991,
-    "predict_seconds": 0.6127198079998379,
+    "fit_seconds": 10.605924377000065,
+    "predict_seconds": 0.6102858829999604,
     "fpr_targeted_threshold": {
-      "threshold": 1.0834193863482566,
+      "threshold": 1.1140205546100217,
       "target_fpr": 0.05,
       "metrics": {
-        "precision": 0.1986648865153538,
-        "recall": 0.43105446118192353,
-        "f1": 0.2719795284225918,
-        "accuracy": 0.9354739417110827,
+        "precision": 0.2569943055211686,
+        "recall": 0.6013904982618772,
+        "f1": 0.3601040763226366,
+        "accuracy": 0.9402368493527954,
         "fpr": 0.050015833069448845,
-        "fnr": 0.5689455388180765,
-        "tp": 744,
+        "fnr": 0.3986095017381228,
+        "tp": 1038,
         "fp": 3001,
         "tn": 57000,
-        "fn": 982,
-        "auc_roc": 0.8914078160497249
+        "fn": 688,
+        "auc_roc": 0.9171700556632283
       }
     }
   },
@@ -95,240 +95,240 @@
     "multi_segment_flows": 24905,
     "task3_1_flow_unsupervised": {
       "metrics": {
-        "precision": 0.5617816091954023,
-        "recall": 0.5445682451253482,
-        "f1": 0.553041018387553,
-        "accuracy": 0.9752816020025031,
-        "fpr": 0.01227364185110664,
-        "fnr": 0.4554317548746518,
-        "tp": 391,
-        "fp": 305,
-        "tn": 24545,
-        "fn": 327,
-        "auc_roc": 0.9775526697791204
+        "precision": 0.6432432432432432,
+        "recall": 0.6620305980528511,
+        "f1": 0.6525017135023989,
+        "accuracy": 0.9801612145875724,
+        "fpr": 0.01062930305592463,
+        "fnr": 0.3379694019471488,
+        "tp": 476,
+        "fp": 264,
+        "tn": 24573,
+        "fn": 243,
+        "auc_roc": 0.9819500192716876
       },
       "per_attack_detection": {
         "DDoS-HTTP_Flood": {
-          "detected": 54,
-          "total": 106,
-          "detection_rate": 0.5094339622641509
+          "detected": 113,
+          "total": 150,
+          "detection_rate": 0.7533333333333333
         },
         "DoS-HTTP_Flood": {
-          "detected": 44,
-          "total": 95,
-          "detection_rate": 0.4631578947368421
+          "detected": 109,
+          "total": 157,
+          "detection_rate": 0.6942675159235668
         },
         "DNS_Spoofing": {
-          "detected": 100,
-          "total": 281,
-          "detection_rate": 0.35587188612099646
+          "detected": 16,
+          "total": 133,
+          "detection_rate": 0.12030075187969924
         },
         "XSS": {
-          "detected": 85,
-          "total": 109,
-          "detection_rate": 0.7798165137614679
+          "detected": 79,
+          "total": 119,
+          "detection_rate": 0.6638655462184874
         },
         "Brute_Force": {
-          "detected": 108,
-          "total": 127,
-          "detection_rate": 0.8503937007874016
+          "detected": 159,
+          "total": 160,
+          "detection_rate": 0.99375
         }
       },
       "hypothesis_flow_beats_packet_auc": true
     },
     "task3_3_supervised_without_flow_anomaly": {
       "backend": "xgboost",
-      "threshold": 0.7999999999999999,
+      "threshold": 0.49999999999999994,
       "metrics": {
-        "precision": 0.9986072423398329,
-        "recall": 0.9986072423398329,
-        "f1": 0.9986072423398329,
-        "accuracy": 0.9999217772215269,
-        "fpr": 4.024144869215292e-05,
-        "fnr": 0.001392757660167131,
-        "tp": 717,
-        "fp": 1,
-        "tn": 24849,
-        "fn": 1,
-        "auc_roc": 0.9999994955807268
+        "precision": 0.9944367176634215,
+        "recall": 0.9944367176634215,
+        "f1": 0.9944367176634215,
+        "accuracy": 0.9996869619658788,
+        "fpr": 0.0001610500463018883,
+        "fnr": 0.005563282336578581,
+        "tp": 715,
+        "fp": 4,
+        "tn": 24833,
+        "fn": 4,
+        "auc_roc": 0.9999767608591046
       },
       "per_attack_detection": {
         "DDoS-HTTP_Flood": {
-          "detected": 106,
-          "total": 106,
+          "detected": 150,
+          "total": 150,
           "detection_rate": 1.0
         },
         "DoS-HTTP_Flood": {
-          "detected": 95,
-          "total": 95,
+          "detected": 157,
+          "total": 157,
           "detection_rate": 1.0
         },
         "DNS_Spoofing": {
-          "detected": 281,
-          "total": 281,
+          "detected": 133,
+          "total": 133,
           "detection_rate": 1.0
         },
         "XSS": {
-          "detected": 108,
-          "total": 109,
-          "detection_rate": 0.9908256880733946
+          "detected": 115,
+          "total": 119,
+          "detection_rate": 0.9663865546218487
         },
         "Brute_Force": {
-          "detected": 127,
-          "total": 127,
+          "detected": 160,
+          "total": 160,
           "detection_rate": 1.0
         }
       },
-      "fit_seconds": 1.583984714000053,
-      "predict_seconds": 0.028887365000173304
+      "fit_seconds": 1.366748838000035,
+      "predict_seconds": 0.0263728390000324
     },
     "task3_3_supervised_with_flow_anomaly": {
       "backend": "xgboost",
-      "threshold": 0.9,
+      "threshold": 0.1,
       "metrics": {
-        "precision": 0.9972183588317107,
-        "recall": 0.9986072423398329,
-        "f1": 0.9979123173277662,
-        "accuracy": 0.9998826658322904,
-        "fpr": 8.048289738430584e-05,
-        "fnr": 0.001392757660167131,
+        "precision": 0.991701244813278,
+        "recall": 0.9972183588317107,
+        "f1": 0.9944521497919556,
+        "accuracy": 0.9996869619658788,
+        "fpr": 0.00024157506945283246,
+        "fnr": 0.0027816411682892906,
         "tp": 717,
-        "fp": 2,
-        "tn": 24848,
-        "fn": 1,
-        "auc_roc": 0.9999996076738986
+        "fp": 6,
+        "tn": 24831,
+        "fn": 2,
+        "auc_roc": 0.9999602974677231
       },
       "per_attack_detection": {
         "DDoS-HTTP_Flood": {
-          "detected": 106,
-          "total": 106,
+          "detected": 150,
+          "total": 150,
           "detection_rate": 1.0
         },
         "DoS-HTTP_Flood": {
-          "detected": 95,
-          "total": 95,
+          "detected": 157,
+          "total": 157,
           "detection_rate": 1.0
         },
         "DNS_Spoofing": {
-          "detected": 281,
-          "total": 281,
+          "detected": 133,
+          "total": 133,
           "detection_rate": 1.0
         },
         "XSS": {
-          "detected": 108,
-          "total": 109,
-          "detection_rate": 0.9908256880733946
+          "detected": 117,
+          "total": 119,
+          "detection_rate": 0.9831932773109243
         },
         "Brute_Force": {
-          "detected": 127,
-          "total": 127,
+          "detected": 160,
+          "total": 160,
           "detection_rate": 1.0
         }
       },
-      "fit_seconds": 1.5291894430001776,
-      "predict_seconds": 0.031662143000176
+      "fit_seconds": 1.5601648580000074,
+      "predict_seconds": 0.025977732000001197
     },
-    "cascade_model": "without_flow_anomaly",
+    "cascade_model": "with_flow_anomaly",
     "top_flow_features": {
-      "pkt_len_max": 0.6752638816833496,
-      "pkt_len_std": 0.17260131239891052,
-      "psh_count": 0.03949204459786415,
-      "iat_std": 0.02694619446992874,
-      "total_packets": 0.020815923810005188,
-      "syn_count": 0.008372346870601177,
-      "dst_port": 0.008239373564720154,
-      "total_bytes": 0.00769808841869235,
-      "protocol": 0.006001649424433708,
-      "pkt_len_mean": 0.005322174169123173,
-      "fwd_packets": 0.00449565052986145,
-      "ack_count": 0.0036113683599978685
+      "pkt_len_max": 0.5962032079696655,
+      "pkt_len_std": 0.21895837783813477,
+      "psh_count": 0.03583637252449989,
+      "iat_std": 0.032260652631521225,
+      "total_packets": 0.022643975913524628,
+      "ack_count": 0.021292852237820625,
+      "pkt_len_mean": 0.013769732788205147,
+      "dst_port": 0.009259599260985851,
+      "total_bytes": 0.008423706516623497,
+      "header_len_total": 0.0082550048828125,
+      "protocol": 0.00781780295073986,
+      "rst_count": 0.006491425912827253
     }
   },
   "cascade": {
     "phase2_only": {
-      "precision": 0.11591131398761004,
-      "recall": 0.8238702201622248,
-      "f1": 0.20322995569529798,
-      "accuracy": 0.8193659176697393,
-      "fpr": 0.18076365393910102,
-      "fnr": 0.1761297798377752,
-      "tp": 1422,
-      "fp": 10846,
-      "tn": 49155,
-      "fn": 304,
-      "auc_roc": 0.8914078160497249
+      "precision": 0.12293961566294122,
+      "recall": 0.8858632676709154,
+      "f1": 0.2159147073360164,
+      "accuracy": 0.8200949341455117,
+      "fpr": 0.18179697005049916,
+      "fnr": 0.11413673232908458,
+      "tp": 1529,
+      "fp": 10908,
+      "tn": 49093,
+      "fn": 197,
+      "auc_roc": 0.9171700556632283
     },
     "supervised_only": {
-      "precision": 0.9890929965556832,
-      "recall": 0.9982618771726536,
-      "f1": 0.9936562860438293,
-      "accuracy": 0.9996435919451779,
-      "fpr": 0.0003166613889768504,
-      "fnr": 0.0017381228273464658,
-      "tp": 1723,
-      "fp": 19,
-      "tn": 59982,
-      "fn": 3,
-      "auc_roc": 0.9999952781783494
+      "precision": 0.9762308998302207,
+      "recall": 0.9994206257242179,
+      "f1": 0.9876896650443745,
+      "accuracy": 0.9993033842564842,
+      "fpr": 0.0006999883335277745,
+      "fnr": 0.0005793742757821553,
+      "tp": 1725,
+      "fp": 42,
+      "tn": 59959,
+      "fn": 1,
+      "auc_roc": 0.9999954423316584
     },
     "two_stage_combined": {
-      "precision": 0.9950946040644709,
-      "recall": 0.8227114716106605,
-      "f1": 0.9007294640025373,
-      "accuracy": 0.9949292854018501,
-      "fpr": 0.00011666472225462909,
-      "fnr": 0.1772885283893395,
-      "tp": 1420,
-      "fp": 7,
-      "tn": 59994,
-      "fn": 306,
-      "auc_roc": 0.8914078160497249
+      "precision": 0.9934980494148244,
+      "recall": 0.8852838933951332,
+      "f1": 0.9362745098039216,
+      "accuracy": 0.9966303238453189,
+      "fpr": 0.00016666388893518441,
+      "fnr": 0.11471610660486674,
+      "tp": 1528,
+      "fp": 10,
+      "tn": 59991,
+      "fn": 198,
+      "auc_roc": 0.9171700556632283
     },
     "per_attack_detection_combined": {
       "DDoS-HTTP_Flood": {
-        "detected": 150,
-        "total": 157,
-        "detection_rate": 0.9554140127388535
+        "detected": 334,
+        "total": 338,
+        "detection_rate": 0.9881656804733728
       },
       "DoS-HTTP_Flood": {
-        "detected": 350,
-        "total": 366,
-        "detection_rate": 0.9562841530054644
+        "detected": 318,
+        "total": 319,
+        "detection_rate": 0.9968652037617555
       },
       "DNS_Spoofing": {
-        "detected": 523,
-        "total": 658,
-        "detection_rate": 0.7948328267477204
+        "detected": 375,
+        "total": 387,
+        "detection_rate": 0.9689922480620154
       },
       "XSS": {
-        "detected": 154,
-        "total": 280,
-        "detection_rate": 0.55
+        "detected": 213,
+        "total": 370,
+        "detection_rate": 0.5756756756756757
       },
       "Brute_Force": {
-        "detected": 243,
-        "total": 265,
-        "detection_rate": 0.9169811320754717
+        "detected": 288,
+        "total": 312,
+        "detection_rate": 0.9230769230769231
       }
     },
-    "false_positive_reduction_pct": 99.9354600774479,
-    "fp_phase2": 10846,
-    "fp_combined": 7,
-    "system_accuracy": 0.9949292854018501,
+    "false_positive_reduction_pct": 99.9083241657499,
+    "fp_phase2": 10908,
+    "fp_combined": 10,
+    "system_accuracy": 0.9966303238453189,
     "mcnemar_combined_vs_phase2": {
-      "statistic": 10831.002306060327,
+      "statistic": 10893.000825763831,
       "p_value": 0.0,
-      "discordant_a_only": 2,
-      "discordant_b_only": 10839
+      "discordant_a_only": 1,
+      "discordant_b_only": 10898
     },
     "timing": {
-      "phase2_fit_s": 11.905821758999991,
-      "phase2_predict_s": 0.6127198079998379,
-      "phase3_fit_s": 1.583984714000053,
-      "phase3_predict_s": 0.028887365000173304,
+      "phase2_fit_s": 10.605924377000065,
+      "phase2_predict_s": 0.6102858829999604,
+      "phase3_fit_s": 1.366748838000035,
+      "phase3_predict_s": 0.0263728390000324,
       "n_packets_scored_phase2": 61727,
-      "n_packets_flagged_for_phase3": 12268,
-      "phase3_workload_fraction": 0.19874609166167156
+      "n_packets_flagged_for_phase3": 12437,
+      "phase3_workload_fraction": 0.20148395353734994
     }
   }
 }

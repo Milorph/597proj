@@ -23,14 +23,18 @@ class SamplingError(ValueError):
 
 def _random_attack_allocation(total_attack: int, rng: np.random.Generator) -> dict:
     """
-    Split ``total_attack`` rows across the five attack types using random
-    Dirichlet weights, guaranteeing each type gets at least one row so every
-    attack class is represented.
+    Split ``total_attack`` rows **roughly uniformly** across the five attack
+    types (per the project clarification: spread evenly across the categories,
+    picked at random). Each type is centred on ``total_attack / 5`` and given a
+    mild random jitter (+/-15%), so every run differs while staying close to an
+    even split, and every type is guaranteed at least one row.
     """
     k = len(config.ATTACK_TYPES)
-    weights = rng.dirichlet(np.ones(k) * 2.0)            # mild concentration
-    counts = np.floor(weights * total_attack).astype(int)
-    counts = np.maximum(counts, 1)                       # every type present
+    base = total_attack / k
+    jitter = rng.uniform(0.85, 1.15, size=k)             # roughly uniform, random
+    raw = base * jitter
+    counts = np.floor(raw / raw.sum() * total_attack).astype(int)
+    counts = np.maximum(counts, 1)                        # every type present
     # Fix rounding drift so the counts sum exactly to total_attack.
     while counts.sum() > total_attack and counts.max() > 1:
         counts[counts.argmax()] -= 1
