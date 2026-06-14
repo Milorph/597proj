@@ -51,11 +51,13 @@ def test_sampling_caps_when_benign_short():
     # crash: it caps benign to availability and scales attack to keep the ratio.
     packets, _ = _small_pop()
     n_avail = int((packets["Label"] == 0).sum())
-    s = sample_dataset(packets, seed=0, n_benign=10_000_000,
+    # Realistic case: ask for the spec's 200k benign (a 2-3% request) from a
+    # population that has fewer -> cap benign, scale attack, keep the ratio.
+    s = sample_dataset(packets, seed=0, n_benign=200_000,
                        attack_min=4_000, attack_max=6_200, verbose=False)
     n_attack = int(s["Label"].sum())
     assert (s["Label"] == 0).sum() == n_avail            # capped to available
-    assert 0.01 <= n_attack / len(s) <= 0.05             # ~2-3% preserved
+    assert 0.015 <= n_attack / len(s) <= 0.035           # ~2-3% preserved
     print("test_sampling_caps_when_benign_short OK")
 
 
