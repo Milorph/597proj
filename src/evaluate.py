@@ -103,8 +103,8 @@ def plot_per_attack(rates_phase2: dict, rates_phase3: dict, fname):
     p3 = [rates_phase3[a]["detection_rate"] for a in atks]
     x = np.arange(len(atks)); w = 0.38
     fig, ax = plt.subplots(figsize=(7.5, 4))
-    ax.bar(x - w / 2, p2, w, label="Phase 2 (packet, unsup.)")
-    ax.bar(x + w / 2, p3, w, label="Phase 3 (flow, sup.)")
+    ax.bar(x - w / 2, p2, w, label="Phase 2 only (packet, unsup.)")
+    ax.bar(x + w / 2, p3, w, label="Two-stage (combined)")
     ax.set_xticks(x); ax.set_xticklabels(atks, rotation=20, ha="right", fontsize=8)
     ax.set_ylabel("Detection rate"); ax.set_ylim(0, 1.05)
     ax.set_title("Per-attack detection rate by phase"); ax.legend(fontsize=8)
