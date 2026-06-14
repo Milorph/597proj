@@ -140,8 +140,11 @@ def plot_cluster_composition(cluster_ids, y_multi, fname):
 
 def _save(fig, fname):
     config.ensure_dirs()
+    # Save as SVG (text-based, renders inline on GitHub, transfers cleanly via
+    # the GitHub contents API). The requested extension is normalised to .svg.
+    fname = os.path.splitext(fname)[0] + ".svg"
     path = os.path.join(config.FIG_DIR, fname)
-    fig.savefig(path, dpi=130, bbox_inches="tight")
+    fig.savefig(path, bbox_inches="tight")
     plt.close(fig)
     print(f"[fig] wrote {path}")
 

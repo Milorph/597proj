@@ -41,7 +41,7 @@ python run.py --no-flow-unsup
 
 Outputs:
 - `results/metrics/results_<scale>.json` — every metric the brief requires.
-- `results/figures/*.png` — confusion matrices, ROC/PR curves, per-attack bars,
+- `results/figures/*.svg` — confusion matrices, ROC/PR curves, per-attack bars,
   anomaly-score distribution, and the K-means cluster-composition plot.
 
 Run the tests:

@@ -176,8 +176,8 @@ All figures are in `results/figures/`; all numbers in
 
 The low precision is **by design**: at a 20 % alert budget the detector raises
 10,846 false positives to achieve 82 % recall and AUC 0.891. This is the wide
-net the second stage will clean up. (Figures: `cm_phase2.png`,
-`phase2_score_dist.png`.)
+net the second stage will clean up. (Figures: `cm_phase2.svg`,
+`phase2_score_dist.svg`.)
 
 **Per-attack detection rate (packet level):**
 
@@ -215,8 +215,8 @@ features (XGBoost gain) are interpretable: `pkt_len_max` (0.68), `pkt_len_std`
 
 **False-positive reduction: 10,846 → 7 = 99.94 %**, with recall preserved
 (0.824 → 0.823 — only true positives Stage 1 happened to miss are lost, none are
-introduced). Figures: `cm_combined.png`, `roc_compare.png`, `pr_compare.png`,
-`per_attack_compare.png`.
+introduced). Figures: `cm_combined.svg`, `roc_compare.svg`, `pr_compare.svg`,
+`per_attack_compare.svg`.
 
 ### 3.4 Statistical significance
 
@@ -316,11 +316,11 @@ operating point (`results/metrics/flow_length_analysis_demo.json`):
 
 **Conclusion:** flow length helps *most where it matters* — the stealthy attack
 whose evidence accumulates over the session. For volumetric attacks the first
-packet already gives the game away. (Figure: `flow_length_analysis.png`.)
+packet already gives the game away. (Figure: `flow_length_analysis.svg`.)
 
 ### 4.6 Cluster structure (DoS/DDoS view)
 
-The k-means cluster-composition plot (`phase2_clusters.png`) shows benign
+The k-means cluster-composition plot (`phase2_clusters.svg`) shows benign
 traffic concentrated in a few dense clusters, while the HTTP-flood DoS/DDoS
 packets collapse into their own small, near-pure high-reconstruction-error
 clusters — they sit far from the benign manifold. DoS and DDoS are
