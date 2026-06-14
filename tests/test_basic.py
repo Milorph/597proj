@@ -46,14 +46,29 @@ def test_sampling_is_random():
     print("test_sampling_is_random OK")
 
 
-def test_sampling_validation_raises():
+def test_sampling_caps_when_benign_short():
+    # Requesting more benign than exists (real data, esp. flow level) should NOT
+    # crash: it caps benign to availability and scales attack to keep the ratio.
     packets, _ = _small_pop()
+    n_avail = int((packets["Label"] == 0).sum())
+    s = sample_dataset(packets, seed=0, n_benign=10_000_000,
+                       attack_min=4_000, attack_max=6_200, verbose=False)
+    n_attack = int(s["Label"].sum())
+    assert (s["Label"] == 0).sum() == n_avail            # capped to available
+    assert 0.01 <= n_attack / len(s) <= 0.05             # ~2-3% preserved
+    print("test_sampling_caps_when_benign_short OK")
+
+
+def test_sampling_raises_without_benign():
+    import pandas as pd
+    attack_only = pd.DataFrame({"Label": [1, 1], "attack_type": config.ATTACK_TYPES[:2],
+                                "x": [0.0, 1.0]})
     try:
-        sample_dataset(packets, seed=0, n_benign=10_000_000, verbose=False)
+        sample_dataset(attack_only, seed=0, n_benign=10, verbose=False)
     except SamplingError:
-        print("test_sampling_validation_raises OK")
+        print("test_sampling_raises_without_benign OK")
         return
-    raise AssertionError("expected SamplingError for impossible benign request")
+    raise AssertionError("expected SamplingError when no benign rows exist")
 
 
 def test_flow_aggregation_one_record_per_flow():
@@ -79,7 +94,8 @@ def test_preprocessor_no_nan_inf():
 if __name__ == "__main__":
     test_sampling_proportions()
     test_sampling_is_random()
-    test_sampling_validation_raises()
+    test_sampling_caps_when_benign_short()
+    test_sampling_raises_without_benign()
     test_flow_aggregation_one_record_per_flow()
     test_preprocessor_no_nan_inf()
     print("\nALL TESTS PASSED")
