@@ -1,0 +1,334 @@
+{
+  "scale": "full",
+  "seed": 42,
+  "data_source": "synthetic",
+  "phase1": {
+    "n_total": 205754,
+    "n_attack": 5754,
+    "attack_ratio": 0.02796543445084907,
+    "n_features": 16,
+    "features": [
+      "src_port",
+      "dst_port",
+      "protocol",
+      "packet_length",
+      "header_length",
+      "payload_length",
+      "ttl",
+      "flag_syn",
+      "flag_ack",
+      "flag_fin",
+      "flag_rst",
+      "flag_psh",
+      "flag_urg",
+      "iat_ms",
+      "inst_rate",
+      "window_size"
+    ]
+  },
+  "phase2": {
+    "contamination": 0.02796697841376964,
+    "alert_budget": 0.2,
+    "threshold": 0.500025549488598,
+    "metrics": {
+      "precision": 0.11591131398761004,
+      "recall": 0.8238702201622248,
+      "f1": 0.20322995569529798,
+      "accuracy": 0.8193659176697393,
+      "fpr": 0.18076365393910102,
+      "fnr": 0.1761297798377752,
+      "tp": 1422,
+      "fp": 10846,
+      "tn": 49155,
+      "fn": 304,
+      "auc_roc": 0.8914078160497249
+    },
+    "per_attack_detection": {
+      "DDoS-HTTP_Flood": {
+        "detected": 150,
+        "total": 157,
+        "detection_rate": 0.9554140127388535
+      },
+      "DoS-HTTP_Flood": {
+        "detected": 351,
+        "total": 366,
+        "detection_rate": 0.9590163934426229
+      },
+      "DNS_Spoofing": {
+        "detected": 523,
+        "total": 658,
+        "detection_rate": 0.7948328267477204
+      },
+      "XSS": {
+        "detected": 155,
+        "total": 280,
+        "detection_rate": 0.5535714285714286
+      },
+      "Brute_Force": {
+        "detected": 243,
+        "total": 265,
+        "detection_rate": 0.9169811320754717
+      }
+    },
+    "fit_seconds": 11.06875517800006,
+    "predict_seconds": 0.6001424029999498,
+    "fpr_targeted_threshold": {
+      "threshold": 1.0834193863482566,
+      "target_fpr": 0.05,
+      "metrics": {
+        "precision": 0.1986648865153538,
+        "recall": 0.43105446118192353,
+        "f1": 0.2719795284225918,
+        "accuracy": 0.9354739417110827,
+        "fpr": 0.050015833069448845,
+        "fnr": 0.5689455388180765,
+        "tp": 744,
+        "fp": 3001,
+        "tn": 57000,
+        "fn": 982,
+        "auc_roc": 0.8914078160497249
+      }
+    }
+  },
+  "phase3": {
+    "n_unified_flows": 365000,
+    "multi_segment_flows": 24905,
+    "task3_1_flow_unsupervised": {
+      "metrics": {
+        "precision": 0.5617816091954023,
+        "recall": 0.5445682451253482,
+        "f1": 0.553041018387553,
+        "accuracy": 0.9752816020025031,
+        "fpr": 0.01227364185110664,
+        "fnr": 0.4554317548746518,
+        "tp": 391,
+        "fp": 305,
+        "tn": 24545,
+        "fn": 327,
+        "auc_roc": 0.9775526697791204
+      },
+      "per_attack_detection": {
+        "DDoS-HTTP_Flood": {
+          "detected": 54,
+          "total": 106,
+          "detection_rate": 0.5094339622641509
+        },
+        "DoS-HTTP_Flood": {
+          "detected": 44,
+          "total": 95,
+          "detection_rate": 0.4631578947368421
+        },
+        "DNS_Spoofing": {
+          "detected": 100,
+          "total": 281,
+          "detection_rate": 0.35587188612099646
+        },
+        "XSS": {
+          "detected": 85,
+          "total": 109,
+          "detection_rate": 0.7798165137614679
+        },
+        "Brute_Force": {
+          "detected": 108,
+          "total": 127,
+          "detection_rate": 0.8503937007874016
+        }
+      },
+      "hypothesis_flow_beats_packet_auc": true
+    },
+    "task3_3_supervised_without_flow_anomaly": {
+      "backend": "xgboost",
+      "threshold": 0.7999999999999999,
+      "metrics": {
+        "precision": 0.9986072423398329,
+        "recall": 0.9986072423398329,
+        "f1": 0.9986072423398329,
+        "accuracy": 0.9999217772215269,
+        "fpr": 4.024144869215292e-05,
+        "fnr": 0.001392757660167131,
+        "tp": 717,
+        "fp": 1,
+        "tn": 24849,
+        "fn": 1,
+        "auc_roc": 0.9999994955807268
+      },
+      "per_attack_detection": {
+        "DDoS-HTTP_Flood": {
+          "detected": 106,
+          "total": 106,
+          "detection_rate": 1.0
+        },
+        "DoS-HTTP_Flood": {
+          "detected": 95,
+          "total": 95,
+          "detection_rate": 1.0
+        },
+        "DNS_Spoofing": {
+          "detected": 281,
+          "total": 281,
+          "detection_rate": 1.0
+        },
+        "XSS": {
+          "detected": 108,
+          "total": 109,
+          "detection_rate": 0.9908256880733946
+        },
+        "Brute_Force": {
+          "detected": 127,
+          "total": 127,
+          "detection_rate": 1.0
+        }
+      },
+      "fit_seconds": 1.4538321590000578,
+      "predict_seconds": 0.026493236999954206
+    },
+    "task3_3_supervised_with_flow_anomaly": {
+      "backend": "xgboost",
+      "threshold": 0.9,
+      "metrics": {
+        "precision": 0.9972183588317107,
+        "recall": 0.9986072423398329,
+        "f1": 0.9979123173277662,
+        "accuracy": 0.9998826658322904,
+        "fpr": 8.048289738430584e-05,
+        "fnr": 0.001392757660167131,
+        "tp": 717,
+        "fp": 2,
+        "tn": 24848,
+        "fn": 1,
+        "auc_roc": 0.9999996076738986
+      },
+      "per_attack_detection": {
+        "DDoS-HTTP_Flood": {
+          "detected": 106,
+          "total": 106,
+          "detection_rate": 1.0
+        },
+        "DoS-HTTP_Flood": {
+          "detected": 95,
+          "total": 95,
+          "detection_rate": 1.0
+        },
+        "DNS_Spoofing": {
+          "detected": 281,
+          "total": 281,
+          "detection_rate": 1.0
+        },
+        "XSS": {
+          "detected": 108,
+          "total": 109,
+          "detection_rate": 0.9908256880733946
+        },
+        "Brute_Force": {
+          "detected": 127,
+          "total": 127,
+          "detection_rate": 1.0
+        }
+      },
+      "fit_seconds": 1.403981937000026,
+      "predict_seconds": 0.02683614900001885
+    },
+    "cascade_model": "without_flow_anomaly",
+    "top_flow_features": {
+      "pkt_len_max": 0.6752638816833496,
+      "pkt_len_std": 0.17260131239891052,
+      "psh_count": 0.03949204459786415,
+      "iat_std": 0.02694619446992874,
+      "total_packets": 0.020815923810005188,
+      "syn_count": 0.008372346870601177,
+      "dst_port": 0.008239373564720154,
+      "total_bytes": 0.00769808841869235,
+      "protocol": 0.006001649424433708,
+      "pkt_len_mean": 0.005322174169123173,
+      "fwd_packets": 0.00449565052986145,
+      "ack_count": 0.0036113683599978685
+    }
+  },
+  "cascade": {
+    "phase2_only": {
+      "precision": 0.11591131398761004,
+      "recall": 0.8238702201622248,
+      "f1": 0.20322995569529798,
+      "accuracy": 0.8193659176697393,
+      "fpr": 0.18076365393910102,
+      "fnr": 0.1761297798377752,
+      "tp": 1422,
+      "fp": 10846,
+      "tn": 49155,
+      "fn": 304,
+      "auc_roc": 0.8914078160497249
+    },
+    "supervised_only": {
+      "precision": 0.9890929965556832,
+      "recall": 0.9982618771726536,
+      "f1": 0.9936562860438293,
+      "accuracy": 0.9996435919451779,
+      "fpr": 0.0003166613889768504,
+      "fnr": 0.0017381228273464658,
+      "tp": 1723,
+      "fp": 19,
+      "tn": 59982,
+      "fn": 3,
+      "auc_roc": 0.9999952781783494
+    },
+    "two_stage_combined": {
+      "precision": 0.9950946040644709,
+      "recall": 0.8227114716106605,
+      "f1": 0.9007294640025373,
+      "accuracy": 0.9949292854018501,
+      "fpr": 0.00011666472225462909,
+      "fnr": 0.1772885283893395,
+      "tp": 1420,
+      "fp": 7,
+      "tn": 59994,
+      "fn": 306,
+      "auc_roc": 0.8914078160497249
+    },
+    "per_attack_detection_combined": {
+      "DDoS-HTTP_Flood": {
+        "detected": 150,
+        "total": 157,
+        "detection_rate": 0.9554140127388535
+      },
+      "DoS-HTTP_Flood": {
+        "detected": 350,
+        "total": 366,
+        "detection_rate": 0.9562841530054644
+      },
+      "DNS_Spoofing": {
+        "detected": 523,
+        "total": 658,
+        "detection_rate": 0.7948328267477204
+      },
+      "XSS": {
+        "detected": 154,
+        "total": 280,
+        "detection_rate": 0.55
+      },
+      "Brute_Force": {
+        "detected": 243,
+        "total": 265,
+        "detection_rate": 0.9169811320754717
+      }
+    },
+    "false_positive_reduction_pct": 99.9354600774479,
+    "fp_phase2": 10846,
+    "fp_combined": 7,
+    "system_accuracy": 0.9949292854018501,
+    "mcnemar_combined_vs_phase2": {
+      "statistic": 10831.002306060327,
+      "p_value": 0.0,
+      "discordant_a_only": 2,
+      "discordant_b_only": 10839
+    },
+    "timing": {
+      "phase2_fit_s": 11.06875517800006,
+      "phase2_predict_s": 0.6001424029999498,
+      "phase3_fit_s": 1.4538321590000578,
+      "phase3_predict_s": 0.026493236999954206,
+      "n_packets_scored_phase2": 61727,
+      "n_packets_flagged_for_phase3": 12268,
+      "phase3_workload_fraction": 0.19874609166167156
+    }
+  }
+}
