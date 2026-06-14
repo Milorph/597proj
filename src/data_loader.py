@@ -106,10 +106,16 @@ def _ensure_flow_id(df: pd.DataFrame) -> pd.DataFrame:
 
     have4 = all(c in df.columns for c in ("src_ip", "dst_ip", "src_port", "dst_port"))
     if have4:
-        ep1 = df["src_ip"].astype(str).str.strip() + ":" + _port_str(df["src_port"])
-        ep2 = df["dst_ip"].astype(str).str.strip() + ":" + _port_str(df["dst_port"])
-        a, b = ep1.to_numpy(), ep2.to_numpy()
-        df["flow_id"] = np.where(a <= b, a + "-" + b, b + "-" + a)
+        src_ip = df["src_ip"].astype("string").fillna("na").str.strip()
+        dst_ip = df["dst_ip"].astype("string").fillna("na").str.strip()
+        ep1 = (src_ip + ":" + _port_str(df["src_port"])).fillna("na:-1")
+        ep2 = (dst_ip + ":" + _port_str(df["dst_port"])).fillna("na:-1")
+        # Canonical (direction-independent) order, done with pandas string ops so
+        # NaN/float values can never sneak into a numpy '+' on object arrays.
+        swap = (ep1 > ep2).fillna(False).to_numpy()
+        fwd = ep1.str.cat(ep2, sep="-")
+        rev = ep2.str.cat(ep1, sep="-")
+        df["flow_id"] = np.where(swap, rev.to_numpy(), fwd.to_numpy())
     elif "flow_id" not in df.columns:
         raise ValueError(
             "Cannot build flow_id: need a 'Flow ID' column or all of "
