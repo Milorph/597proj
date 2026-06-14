@@ -78,8 +78,23 @@ def _find_col(df: pd.DataFrame, canonical: str):
     return None
 
 
+def _port_str(s: pd.Series) -> pd.Series:
+    """Normalise a port column to a clean integer string ('80' not '80.0')."""
+    return pd.to_numeric(s, errors="coerce").fillna(-1).astype("int64").astype(str)
+
+
 def _ensure_flow_id(df: pd.DataFrame) -> pd.DataFrame:
-    """Guarantee a ``flow_id`` column and canonical id columns where possible."""
+    """
+    Guarantee a ``flow_id`` column and canonical id columns where possible.
+
+    For real CIC data we build a **canonical, direction-independent** flow_id
+    from the 4-tuple (src IP+port, dst IP+port) by ordering the two endpoints,
+    so a packet seen in either direction maps to the same flow as its
+    (bi-directional) CICFlowMeter flow record. We deliberately ignore any
+    pre-existing ``Flow ID`` column, because CICFlowMeter's includes the
+    protocol (5-tuple) and a fixed direction, which would not match the packet
+    side. This matches the brief's definition: srcIP-dstIP-sport-dport.
+    """
     df = df.copy()
     # Rename detected identifier columns to canonical names (non-destructive).
     for canon in ("flow_id", "src_ip", "dst_ip", "src_port", "dst_port"):
@@ -89,16 +104,17 @@ def _ensure_flow_id(df: pd.DataFrame) -> pd.DataFrame:
         if found is not None:
             df = df.rename(columns={found: canon})
 
-    if "flow_id" not in df.columns:
-        have = [c for c in ("src_ip", "dst_ip", "src_port", "dst_port") if c in df.columns]
-        if len(have) == 4:
-            df["flow_id"] = (df["src_ip"].astype(str) + "-" + df["dst_ip"].astype(str)
-                             + "-" + df["src_port"].astype(str) + "-"
-                             + df["dst_port"].astype(str))
-        else:
-            raise ValueError(
-                "Cannot build flow_id: need a 'Flow ID' column or all of "
-                "src/dst IP + src/dst port. Found columns: " + ", ".join(map(str, df.columns[:30])))
+    have4 = all(c in df.columns for c in ("src_ip", "dst_ip", "src_port", "dst_port"))
+    if have4:
+        ep1 = df["src_ip"].astype(str).str.strip() + ":" + _port_str(df["src_port"])
+        ep2 = df["dst_ip"].astype(str).str.strip() + ":" + _port_str(df["dst_port"])
+        a, b = ep1.to_numpy(), ep2.to_numpy()
+        df["flow_id"] = np.where(a <= b, a + "-" + b, b + "-" + a)
+    elif "flow_id" not in df.columns:
+        raise ValueError(
+            "Cannot build flow_id: need a 'Flow ID' column or all of "
+            "src/dst IP + src/dst port. Found columns: "
+            + ", ".join(map(str, df.columns[:30])))
     return df
 
 

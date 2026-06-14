@@ -69,9 +69,21 @@ def sample_dataset(population: pd.DataFrame,
             raise SamplingError(f"population missing required column '{col}'")
 
     benign_pool = population[population["Label"] == 0]
+    if len(benign_pool) == 0:
+        raise SamplingError("population contains no benign rows")
     if len(benign_pool) < n_benign:
-        raise SamplingError(
-            f"need {n_benign:,} benign rows but population has only {len(benign_pool):,}")
+        # Real data can have fewer benign records than the spec's 200k (e.g. the
+        # flow level, where many segments collapse into one flow). Cap benign to
+        # what's available and scale the attack budget down by the same factor so
+        # the ~2-3% imbalance ratio is preserved.
+        factor = len(benign_pool) / n_benign
+        new_min = max(len(config.ATTACK_TYPES), int(round(attack_min * factor)))
+        new_max = max(new_min, int(round(attack_max * factor)))
+        print(f"[sample] NOTE: only {len(benign_pool):,} benign rows available "
+              f"(< {n_benign:,} requested); capping benign and scaling attack "
+              f"budget to {new_min:,}-{new_max:,} to keep the ~2-3% ratio.")
+        n_benign = len(benign_pool)
+        attack_min, attack_max = new_min, new_max
 
     total_attack = int(rng.integers(attack_min, attack_max + 1))
     alloc = _random_attack_allocation(total_attack, rng)
