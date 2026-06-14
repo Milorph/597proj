@@ -260,8 +260,9 @@ def run(scale: str = "demo", seed: int = config.DEFAULT_SEED,
     # ===================================================================== #
     print("\n--- TWO-STAGE CASCADE: re-check Phase-2 alerts at flow level ---")
     # Look up each packet-test row's unified flow record, transform identically.
-    mapped = test_df[["flow_id"]].merge(unified, on="flow_id", how="left")
-    have_flow = mapped["total_packets"].notna().to_numpy()
+    mapped = test_df[["flow_id"]].merge(unified, on="flow_id", how="left", indicator=True)
+    have_flow = (mapped["_merge"] == "both").to_numpy()
+    mapped = mapped.drop(columns="_merge")
     Xcasc = fprep.transform(mapped.ffill().bfill())
     if do_flow_unsup and report["phase3"]["cascade_model"] == "with_flow_anomaly":
         casc_anom = fdet.anomaly_score(Xcasc).reshape(-1, 1)

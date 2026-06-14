@@ -64,24 +64,44 @@ python tests/test_basic.py        # or: pytest tests/
 
 ### Using the real dataset
 
-1. Download both the **packet-level** and **flow-level** files from
-   <http://cicresearch.ca/IOTDataset/CIC%20IoT-IDAD%20Dataset%202024/>
-   (dataset info: <https://www.unb.ca/cic/datasets/iot-diad-2024.html>).
-2. Place / concatenate them as:
-   ```
-   data/packet_level.csv
-   data/flow_level.csv
-   ```
-   (Override paths with the `IDS_PACKET_CSV` / `IDS_FLOW_CSV` env vars, or the
-   parent directory with `IDS_DATA_DIR`.)
-3. Run `python run.py --scale full`. The loader auto-detects the real files;
-   `src/data_loader._normalize_labels` maps the published label strings onto the
-   five canonical attack classes and derives the binary `Label`.
+Download from the CIC server
+(<http://cicresearch.ca/IOTDataset/CIC%20IoT-IDAD%20Dataset%202024/>,
+info: <https://www.unb.ca/cic/datasets/iot-diad-2024.html>). The dataset has two
+top folders — *"…Packet Based Features"* and *"…Flow Based features"* — each with
+a sub-folder per attack family. From **both** top folders take the same five
+categories (and Benign); per the brief, use the **HTTP-Flood (TCP)** files for
+DoS/DDoS (TCP-Flood/UDP variants are excluded), and **ignore Mirai / Recon**:
 
-Attacks used (per the brief; flow data for the TCP-Flood variants is not in this
-release, so the **HTTP-Flood** variants are used for DoS and DDoS):
+| Category | Sub-folder | File to take |
+|---|---|---|
+| Benign | `Benign` / `BenignTraffic` | the benign file |
+| Brute Force | `BruteForce` | brute-force file |
+| DDoS-HTTP Flood | `DDoS` | the file with **HTTP** in its name |
+| DoS-HTTP Flood | `DoS` | the file with **HTTP** in its name |
+| DNS Spoofing | `Spoofing` | the **DNS** file |
+| XSS | `Web-Based` | the **XSS** file |
 
-`DDoS-HTTP_Flood`, `DoS-HTTP_Flood`, `DNS_Spoofing`, `XSS`, `Brute_Force`.
+**Two ways to supply the files** (the loader tries them in order):
+
+* **Folder mode (easiest — no manual merging).** Drop the downloaded CSVs,
+  keeping the attack sub-folders, into:
+  ```
+  data/packet/<Category>/<file>.csv     # from "…Packet Based Features"
+  data/flow/<Category>/<file>.csv       # from "…Flow Based features"
+  ```
+  The loader globs every CSV, infers each file's label from its sub-folder name,
+  strips column-name whitespace, and builds a `flow_id` from the Src/Dst IP +
+  Port columns when the file has none. (Override dirs with `IDS_PACKET_DIR` /
+  `IDS_FLOW_DIR`; cap rows per file with `IDS_MAX_ROWS_PER_FILE` if memory is
+  tight.)
+* **Single-CSV mode.** Or concatenate into `data/packet_level.csv` +
+  `data/flow_level.csv` (override with `IDS_PACKET_CSV` / `IDS_FLOW_CSV`); labels
+  are read from the file's own label column.
+
+Then run `python run.py --scale full` — the loader auto-detects real data and the
+rest of the pipeline is unchanged. (If your CSV column names differ, the generic
+preprocessing still works; only the per-feature flow-aggregation policy falls
+back to a name heuristic — sum counts, max peaks, mean rates.)
 
 ### The synthetic generator
 

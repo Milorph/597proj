@@ -27,9 +27,19 @@ RESULTS_DIR = os.path.join(ROOT_DIR, "results")
 FIG_DIR = os.path.join(RESULTS_DIR, "figures")
 METRICS_DIR = os.path.join(RESULTS_DIR, "metrics")
 
-# Real-dataset file names expected under DATA_DIR (override via env if needed).
+# Real-dataset inputs. Two ways to provide them (either works):
+#   (a) single concatenated CSVs:  data/packet_level.csv , data/flow_level.csv
+#   (b) folders of raw CIC files:   data/packet/**.csv  ,  data/flow/**.csv
+#       -> the loader globs every CSV under the folder and infers the attack
+#          label from the sub-folder name (Benign/BruteForce/DDoS/DoS/...),
+#          so you can just drop the downloaded files in without merging them.
 PACKET_CSV = os.environ.get("IDS_PACKET_CSV", os.path.join(DATA_DIR, "packet_level.csv"))
 FLOW_CSV = os.environ.get("IDS_FLOW_CSV", os.path.join(DATA_DIR, "flow_level.csv"))
+PACKET_DIR = os.environ.get("IDS_PACKET_DIR", os.path.join(DATA_DIR, "packet"))
+FLOW_DIR = os.environ.get("IDS_FLOW_DIR", os.path.join(DATA_DIR, "flow"))
+# Optional safety cap on rows read per raw CSV (real packet files are huge).
+# Set IDS_MAX_ROWS_PER_FILE=500000 etc. to bound memory; default = read all.
+MAX_ROWS_PER_FILE = int(os.environ["IDS_MAX_ROWS_PER_FILE"]) if os.environ.get("IDS_MAX_ROWS_PER_FILE") else None
 
 # --------------------------------------------------------------------------- #
 # Attack taxonomy (per project spec, Section 3)

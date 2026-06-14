@@ -46,6 +46,24 @@ AGG_MAP = {
 }
 
 
+def _infer_agg(col: str) -> str:
+    """
+    Heuristic aggregation for columns not in AGG_MAP (e.g. raw CIC flow columns):
+    additive counts/totals -> sum, peak/max -> max, everything else -> mean.
+    """
+    n = col.lower()
+    if "/s" in n or "rate" in n or "mean" in n or "avg" in n or "std" in n or "ratio" in n:
+        return "mean"
+    if n.startswith("max") or n.endswith("max") or "maximum" in n:
+        return "max"
+    if n.startswith("min") or n.endswith("min") or "minimum" in n:
+        return "min"
+    if ("tot" in n or "count" in n or "cnt" in n or "duration" in n or "bytes" in n
+            or "packet" in n or "pkts" in n or "flag" in n or "len" in n and "total" in n):
+        return "sum"
+    return "mean"
+
+
 def aggregate_flows(flow_df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """
     Group ``flow_df`` by ``flow_id`` and produce one unified record per flow.
@@ -54,13 +72,14 @@ def aggregate_flows(flow_df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame
     aggregated features plus ``Label`` / ``attack_type`` (taken as the segment
     majority) and a ``n_segments`` book-keeping column.
     """
-    feat_cols = [c for c in config.__dict__ if False]  # noop to satisfy linters
     agg = {}
     for col in flow_df.columns:
         if col in ("flow_id", "Label", "attack_type",
                    "src_ip", "dst_ip", "src_port", "dst_port", "segment_index"):
             continue
-        agg[col] = AGG_MAP.get(col, "mean")
+        if not pd.api.types.is_numeric_dtype(flow_df[col]):
+            continue                                        # skip stray string cols
+        agg[col] = AGG_MAP.get(col) or _infer_agg(col)
 
     grouped = flow_df.groupby("flow_id", sort=False)
     unified = grouped.agg(agg)
@@ -95,8 +114,8 @@ def map_packets_to_flows(packet_sample: pd.DataFrame,
     cols = [c for c in unified_flows.columns if c not in ("Label", "attack_type")]
     merged = packet_sample[["flow_id"]].merge(
         unified_flows[cols + ["Label", "attack_type"]],
-        on="flow_id", how="left", suffixes=("", "_flow"))
-    missing = merged["total_packets"].isna().sum() if "total_packets" in merged else 0
+        on="flow_id", how="left", indicator=True)
+    missing = int((merged["_merge"] != "both").sum())
     if missing:
-        print(f"[flow-map] {missing:,} packets had no matching flow record (dropped).")
-    return merged
+        print(f"[flow-map] {missing:,} packets had no matching flow record.")
+    return merged.drop(columns="_merge")
