@@ -1,0 +1,40 @@
+# phase 3 -- run:  python supervised.py   (from inside this folder)
+
+import os
+import joblib
+from sklearn.model_selection import train_test_split
+
+import common
+from models import Prep, Classifier, DROP_FLOW
+
+
+def main():
+    print("loading flow data...")
+    flows = common.load_flows()                         # data/flow/<attack>/*.csv
+    unified = common.aggregate_flows(flows)             # one record per flow
+    df = common.sample_dataset(unified)                 # 200k benign + 2-3% attacks
+
+    tr, tmp = train_test_split(df, test_size=0.3, random_state=42,
+                               stratify=df["attack_type"])
+    val, te = train_test_split(tmp, test_size=0.5, random_state=42,
+                               stratify=tmp["attack_type"])
+
+    prep = Prep(DROP_FLOW)
+    Xtr = prep.fit_transform(tr)
+    Xval = prep.transform(val)
+    Xte = prep.transform(te)
+    ytr, yval, yte = tr["Label"].to_numpy(), val["Label"].to_numpy(), te["Label"].to_numpy()
+
+    clf = Classifier().fit(Xtr, ytr)
+    thr = clf.tune(Xval, yval)
+    m = common.binary_metrics(yte, clf.predict(Xte, thr), clf.proba(Xte))
+    print("F1=%.3f AUC=%.3f P=%.3f R=%.3f thr=%.2f"
+          % (m["f1"], m["auc_roc"], m["precision"], m["recall"], thr))
+
+    os.makedirs("artifacts", exist_ok=True)
+    joblib.dump((prep, clf, thr), "artifacts/supervised.joblib")   # for the cascade later
+    print("saved artifacts/supervised.joblib")
+
+
+if __name__ == "__main__":
+    main()
