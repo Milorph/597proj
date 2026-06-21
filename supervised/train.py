@@ -4,14 +4,14 @@ import os
 import joblib
 from sklearn.model_selection import train_test_split
 
-from src import data_loader, sampling, flow_aggregation, evaluate
+import common
 from supervised.model import Prep, Classifier
 
 
 def main():
-    _, flows, src = data_loader.load_populations()      # reads real csvs from data/flow
-    unified = flow_aggregation.aggregate_flows(flows)   # one record per flow
-    df = sampling.sample_dataset(unified)               # 200k benign + 2-3% attacks
+    flows = common.load_flows()                         # reads real csvs from data/flow
+    unified = common.aggregate_flows(flows)             # one record per flow
+    df = common.sample_dataset(unified)                 # 200k benign + 2-3% attacks
 
     tr, tmp = train_test_split(df, test_size=0.3, random_state=42,
                                stratify=df["attack_type"])
@@ -26,7 +26,7 @@ def main():
 
     clf = Classifier().fit(Xtr, ytr)
     thr = clf.tune(Xval, yval)
-    m = evaluate.binary_metrics(yte, clf.predict(Xte, thr), clf.proba(Xte))
+    m = common.binary_metrics(yte, clf.predict(Xte, thr), clf.proba(Xte))
     print("F1=%.3f AUC=%.3f P=%.3f R=%.3f thr=%.2f"
           % (m["f1"], m["auc_roc"], m["precision"], m["recall"], thr))
 
